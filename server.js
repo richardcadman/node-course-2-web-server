@@ -1,0 +1,61 @@
+const express = require('express');
+const hbs = require('hbs');
+const fs = require('fs');
+
+var app = express();
+
+//partials mean we can reuse code modules, e.g. footer
+hbs.registerPartials(__dirname + '/views/partials')
+//middleware, easy way to set up a static directory on node, using express, where we can include css or js or html
+app.set('view engine', 'hbs');
+
+app.use((req, res, next) => {
+  var now = new Date().toString();
+  var log = `${now}: ${req.method} ${req.url}`;
+
+  console.log(log);
+  fs.appendFile('server.log', log + '\n');
+  next();
+});
+
+// app.use((req, res, next) => {
+//   res.render('maintenance.hbs');
+// });
+
+app.use(express.static(__dirname + '/public'));
+
+hbs.registerHelper('getCurrentYear', () => {
+  return new Date().getFullYear();
+});
+
+hbs.registerHelper('screamIt', (text) => {
+  return text.toUpperCase();
+});
+
+app.get('/', (req, res) => {
+  res.render('home.hbs', {
+    pageTitle: 'Home Page',
+    welcomeMessage: 'Welcome to my website'
+  });
+});
+
+app.get('/about', (req, res) => {
+  res.render('about.hbs', {
+    pageTitle: 'About Page'
+  });
+});
+
+// /bad - send back json with errorMessage
+app.get('/bad', (req, res) => {
+  res.send({
+    errorMessage: 'Unable to handle request'
+  });
+});
+
+app.listen(3000, () => {
+  console.log('Server is up on port 3000');
+});
+
+
+// use nodemon server.js -e js,hbs
+// this way it'll refresh
