@@ -15,7 +15,9 @@ app.use((req, res, next) => {
   var log = `${now}: ${req.method} ${req.url}`;
 
   console.log(log);
-  fs.appendFile('server.log', log + '\n');
+  fs.appendFile('server.log', log + '\n', (error) => {
+    if (error) throw error; 
+  });
   next();
 });
 
@@ -43,6 +45,13 @@ app.get('/', (req, res) => {
 app.get('/about', (req, res) => {
   res.render('about.hbs', {
     pageTitle: 'About Page'
+  });
+});
+
+app.get('/portfolio', (req, res) => {
+  res.render('portfolio.hbs', {
+    pageTitle: 'Portfolio Page',
+    welcomeMessage: 'Portfolio Links'
   });
 });
 
